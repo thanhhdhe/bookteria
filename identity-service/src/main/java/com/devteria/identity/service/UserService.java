@@ -3,9 +3,9 @@ package com.devteria.identity.service;
 import java.util.HashSet;
 import java.util.List;
 
-import com.devteria.identity.dto.request.ProfileCreationRequest;
-import com.devteria.identity.mapper.ProfileMapper;
-import com.devteria.identity.repository.httpclient.ProfileClient;
+import com.devteria.event.dto.NotificationEvent;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,16 +19,16 @@ import com.devteria.identity.entity.Role;
 import com.devteria.identity.entity.User;
 import com.devteria.identity.exception.AppException;
 import com.devteria.identity.exception.ErrorCode;
+import com.devteria.identity.mapper.ProfileMapper;
 import com.devteria.identity.mapper.UserMapper;
 import com.devteria.identity.repository.RoleRepository;
 import com.devteria.identity.repository.UserRepository;
+import com.devteria.identity.repository.httpclient.ProfileClient;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Service
 @RequiredArgsConstructor
@@ -38,29 +38,46 @@ public class UserService {
     UserRepository userRepository;
     RoleRepository roleRepository;
     UserMapper userMapper;
+    ProfileMapper profileMapper;
     PasswordEncoder passwordEncoder;
     ProfileClient profileClient;
-    ProfileMapper profileMapper;
-    public UserResponse createUser(UserCreationRequest request) {
-        if (userRepository.existsByUsername(request.getUsername())) throw new AppException(ErrorCode.USER_EXISTED);
+    KafkaTemplate<String, Object> kafkaTemplate;
 
+    public UserResponse createUser(UserCreationRequest request) {
         User user = userMapper.toUser(request);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-
         HashSet<Role> roles = new HashSet<>();
+
         roleRepository.findById(PredefinedRole.USER_ROLE).ifPresent(roles::add);
 
         user.setRoles(roles);
-        user = userRepository.save(user);
+        user.setEmailVerified(false);
+
+        try {
+            user = userRepository.save(user);
+        } catch (DataIntegrityViolationException exception){
+            throw new AppException(ErrorCode.USER_EXISTED);
+        }
+
         var profileRequest = profileMapper.toProfileCreationRequest(request);
         profileRequest.setUserId(user.getId());
 
-        ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        var authHeader = servletRequestAttributes.getRequest().getHeader("Authorization");
-        log.info("Authorization header : {}", authHeader);
+        var profile = profileClient.createProfile(profileRequest);
+        log.info("Profile created {}", profile);
+        NotificationEvent  notificationEvent = NotificationEvent.builder()
+                .channel("EMAIL")
+                .recipient(request.getEmail())
+                .subject("Welcome to bookteria!")
+                .body("Hello " + request.getUsername())
+                .build();
+        // Publish message to kafka
+        kafkaTemplate.send("notification-delivery", notificationEvent);
 
-        profileClient.createProfile(profileRequest);
-        return userMapper.toUserResponse(user);
+        var userCreationResponse = userMapper.toUserResponse(user);
+        log.info("user creation response : {}", userCreationResponse);
+        userCreationResponse.setId(profile.getResult().getId());
+
+        return userCreationResponse;
     }
 
     public UserResponse getMyInfo() {

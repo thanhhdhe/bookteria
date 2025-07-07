@@ -1,5 +1,6 @@
 package com.devteria.profile.controller;
 
+import com.devteria.profile.dto.ApiResponse;
 import com.devteria.profile.dto.request.UserProfileCreationRequest;
 import com.devteria.profile.dto.response.UserProfileCreationResponse;
 import com.devteria.profile.service.UserProfileService;
@@ -16,8 +17,9 @@ public class InternalUserProfileController {
     UserProfileService userProfileService;
 
     @PostMapping("/internal/users")
-    UserProfileCreationResponse createUserProfile(@RequestBody UserProfileCreationRequest request) {
-
-        return userProfileService.createProfile(request);
+    ApiResponse<UserProfileCreationResponse> createUserProfile(@RequestBody UserProfileCreationRequest request) {
+        return ApiResponse.<UserProfileCreationResponse>builder()
+                .result(userProfileService.createProfile(request))
+                .build();
     }
 }
