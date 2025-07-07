@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class EmailService {
     EmailClient emailClient;
-    String apiKey = "api key";
+    String apiKey = "Bearer re_ZUxVMRrD_GRzndEKnA7h8H8qmDGbUYVR2";
     public EmailResponse sendEmail(SendEmailRequest sendEmailRequest) {
         EmailRequest emailRequest = EmailRequest.builder()
                 .from("onboarding@resend.dev")

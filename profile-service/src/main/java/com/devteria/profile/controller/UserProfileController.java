@@ -1,5 +1,6 @@
 package com.devteria.profile.controller;
 
+import com.devteria.profile.dto.ApiResponse;
 import com.devteria.profile.dto.request.UserProfileCreationRequest;
 import com.devteria.profile.dto.response.UserProfileCreationResponse;
 import com.devteria.profile.entity.UserProfile;
@@ -25,5 +26,11 @@ public class UserProfileController {
     @GetMapping("/users")
     List<UserProfileCreationResponse> getAllUserProfile() {
         return userProfileService.getAllProfile();
+    }
+    @GetMapping("/users/my-profile")
+    ApiResponse<UserProfileCreationResponse> getMyProfile() {
+        return ApiResponse.<UserProfileCreationResponse>builder()
+                .result(userProfileService.getMyProfile())
+                .build();
     }
 }
