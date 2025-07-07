@@ -31,7 +31,12 @@ public class UserProfileService {
         userProfile =  userProfileRepository.save(userProfile);
         return userProfileMapper.toUserProfileCreationResponse(userProfile);
     }
-
+    public UserProfileCreationResponse getByUserId(String userId){
+         UserProfile userProfile = userProfileRepository.findByUserId(userId).orElseThrow(
+                 () -> new AppException(ErrorCode.USER_NOT_EXISTED)
+         );
+        return userProfileMapper.toUserProfileCreationResponse(userProfile);
+    }
     public UserProfileCreationResponse getProfile(String id){
         UserProfile userProfile = userProfileRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Profile not found"));

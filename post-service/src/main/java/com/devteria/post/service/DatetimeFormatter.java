@@ -35,15 +35,15 @@ public class DatetimeFormatter {
 
     private String formatInSeconds(Instant instant) {
         long elapseSeconds = ChronoUnit.SECONDS.between(instant, Instant.now());
-        return elapseSeconds + " seconds";
+        return String.format("%s second(s) ago", elapseSeconds);
     }
     private String formatInMinutes(Instant instant) {
         long elapseMinutes = ChronoUnit.MINUTES.between(instant, Instant.now());
-        return elapseMinutes + " minutes";
+        return String.format("%s minute(s) ago", elapseMinutes);
     }
     private String formatInHours(Instant instant) {
         long elapseHours = ChronoUnit.HOURS.between(instant, Instant.now());
-        return elapseHours + " hours";
+        return String.format("%s hour(s) ago", elapseHours);
     }
     private String formatInDates(Instant instant) {
         LocalDateTime localDateTime = instant.atZone(ZoneId.systemDefault()).toLocalDateTime();
