@@ -33,7 +33,7 @@ export default function Profile() {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [city, setCity] = useState("");
-  const [dob, setDob] = useState(null);
+  const [birthDate, setDob] = useState(null);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
@@ -51,7 +51,7 @@ export default function Profile() {
       setLastName(data.result.lastName || "");
       setEmail(data.result.email || "");
       setCity(data.result.city || "");
-      setDob(data.result.dob ? dayjs(data.result.dob) : null);
+      setDob(data.result.birthDate ? dayjs(data.result.birthDate) : null);
     } catch (error) {
       if (error.response?.status === 401) {
         logOut();
@@ -68,7 +68,7 @@ export default function Profile() {
         lastName,
         email,
         city,
-        dob: dob ? dob.format("YYYY-MM-DD") : null,
+        birthDate: birthDate ? birthDate.format("YYYY-MM-DD") : null,
       };
 
       await updateProfile(profileData);
@@ -434,7 +434,7 @@ export default function Profile() {
               </Typography>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
-                  value={dob}
+                  value={birthDate}
                   onChange={(newValue) => setDob(newValue)}
                   slotProps={{ textField: { size: "small" } }}
                   sx={{ width: "60%" }}
