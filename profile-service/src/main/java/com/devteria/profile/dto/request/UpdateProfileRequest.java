@@ -1,5 +1,4 @@
-package com.devteria.profile.dto.response;
-
+package com.devteria.profile.dto.request;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -7,14 +6,11 @@ import lombok.experimental.FieldDefaults;
 import java.time.LocalDate;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserProfileCreationResponse {
-    String id;
-    String username;
-    String avatar;
+public class UpdateProfileRequest {
     String email;
     String firstName;
     String lastName;

@@ -1,9 +1,8 @@
 package com.devteria.profile.controller;
 
 import com.devteria.profile.dto.ApiResponse;
-import com.devteria.profile.dto.request.UserProfileCreationRequest;
+import com.devteria.profile.dto.request.UpdateProfileRequest;
 import com.devteria.profile.dto.response.UserProfileCreationResponse;
-import com.devteria.profile.entity.UserProfile;
 import com.devteria.profile.service.UserProfileService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +30,13 @@ public class UserProfileController {
     ApiResponse<UserProfileCreationResponse> getMyProfile() {
         return ApiResponse.<UserProfileCreationResponse>builder()
                 .result(userProfileService.getMyProfile())
+                .build();
+    }
+
+    @PutMapping("/users/my-profile")
+    ApiResponse<UserProfileCreationResponse> updateMyProfile(@RequestBody UpdateProfileRequest request) {
+        return ApiResponse.<UserProfileCreationResponse>builder()
+                .result(userProfileService.updateMyProfile(request))
                 .build();
     }
 }

@@ -1,6 +1,7 @@
 package com.devteria.profile.service;
 
 
+import com.devteria.profile.dto.request.UpdateProfileRequest;
 import com.devteria.profile.dto.request.UserProfileCreationRequest;
 import com.devteria.profile.dto.response.UserProfileCreationResponse;
 import com.devteria.profile.entity.UserProfile;
@@ -56,5 +57,16 @@ public class UserProfileService {
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
         return userProfileMapper.toUserProfileCreationResponse(profile);
+    }
+    public UserProfileCreationResponse updateMyProfile(UpdateProfileRequest request) {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userId = authentication.getName();
+
+        var profile = userProfileRepository.findByUserId(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        userProfileMapper.update(profile, request);
+
+        return userProfileMapper.toUserProfileCreationResponse(userProfileRepository.save(profile));
     }
 }
