@@ -1,6 +1,7 @@
 package com.devteria.profile.service;
 
 
+import com.devteria.profile.dto.request.SearchUserRequest;
 import com.devteria.profile.dto.request.UpdateProfileRequest;
 import com.devteria.profile.dto.request.UserProfileCreationRequest;
 import com.devteria.profile.dto.response.UserProfileCreationResponse;
@@ -87,5 +88,14 @@ public class UserProfileService {
         profile.setAvatar(response.getResult().getUrl());
 
         return userProfileMapper.toUserProfileCreationResponse(userProfileRepository.save(profile));
+    }
+
+    public List<UserProfileCreationResponse> search(SearchUserRequest request) {
+        var userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        List<UserProfile> userProfiles = userProfileRepository.findAllByUsernameLike(request.getKeyword());
+        return userProfiles.stream()
+                .filter(userProfile -> !userId.equals(userProfile.getUserId()))
+                .map(userProfileMapper::toUserProfileCreationResponse)
+                .toList();
     }
 }

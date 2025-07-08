@@ -13,6 +13,7 @@ import java.time.LocalDate;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserProfileCreationResponse {
     String id;
+    String userId;
     String username;
     String avatar;
     String email;
