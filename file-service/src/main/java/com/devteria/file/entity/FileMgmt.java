@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.core.mapping.MongoId;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Document(collation = "file_mgmt")
+@Document(collection = "file_mgmt")
 public class FileMgmt {
     @MongoId
     String id;
